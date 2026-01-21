@@ -1,0 +1,51 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: Article_SFE_Influential_Observations.aux
+Reallocating 'name_of_file' (item size: 1) to 9 items.
+The style file: unsrtnat.bst
+Reallocating 'name_of_file' (item size: 1) to 10 items.
+Database file #1: mybibfile.bib
+Warning--I didn't find a database entry for "Chatterjee1988"
+Warning--can't use both author and editor fields in Fiacco1990
+You've used 51 entries,
+            2481 wiz_defined-function locations,
+            983 strings with 16474 characters,
+and the built_in function-call counts, 19449 in all, are:
+= -- 1755
+> -- 947
+< -- 26
++ -- 377
+- -- 274
+* -- 1594
+:= -- 3245
+add.period$ -- 244
+call.type$ -- 51
+change.case$ -- 96
+chr.to.int$ -- 50
+cite$ -- 52
+duplicate$ -- 954
+empty$ -- 1702
+format.name$ -- 345
+if$ -- 4076
+int.to.chr$ -- 2
+int.to.str$ -- 52
+missing$ -- 58
+newline$ -- 351
+num.names$ -- 153
+pop$ -- 318
+preamble$ -- 1
+purify$ -- 51
+quote$ -- 0
+skip$ -- 508
+stack$ -- 0
+substring$ -- 711
+swap$ -- 134
+text.length$ -- 2
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 336
+warning$ -- 1
+while$ -- 149
+width$ -- 0
+write$ -- 834
+(There were 2 warnings)

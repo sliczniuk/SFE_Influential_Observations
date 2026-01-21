@@ -86,7 +86,7 @@ function visualize_influence(results, varargin)
     ylabel('|Eigenvalue|');
     title(sprintf('Hessian Eigenvalues (Cond: %.2f)', results.condition_number));
     grid on;
-    yscale('log');
+    %yscale('log');
     
     %% Plot 6: Variance contributions
     subplot(3, 3, 6);

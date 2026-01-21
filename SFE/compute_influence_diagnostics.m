@@ -29,7 +29,8 @@ function results = compute_influence_diagnostics(H, jacobians)
     end
     
     %% 1. Compute inverse Hessian
-    H_inv = inv(H);
+    % Use backslash for better numerical stability than inv()
+    H_inv = H \ eye(size(H));
     results.H_inv = H_inv;
     
     %% 2. Eigenvalue decomposition of Hessian

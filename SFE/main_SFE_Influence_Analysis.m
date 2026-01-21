@@ -2,8 +2,8 @@ startup;
 delete(gcp('nocreate'));
 % %p = Pushbullet(pushbullet_api);
 
-%addpath('C:\Dev\casadi-3.6.3-windows64-matlab2018b');
-addpath('\\home.org.aalto.fi\sliczno1\data\Documents\casadi-3.6.3-windows64-matlab2018b');
+addpath('C:\Dev\casadi-3.6.3-windows64-matlab2018b');
+%addpath('\\home.org.aalto.fi\sliczno1\data\Documents\casadi-3.6.3-windows64-matlab2018b');
 import casadi.*
 
 excel_file = 'Chamomile_Di_Gamma_2.xls';
@@ -15,24 +15,10 @@ Parameters              = num2cell(Parameters_table{:,3});                  % Pa
 
 LabResults              = xlsread('dataset_2.xlsx');
 
-%N_trial                 = 1;
-%Iteration_max           = 15;                                              % Maximum number of iterations for optimzer
-%Time_max                = 12;                                               % Maximum time of optimization in [h]
-
-%nlp_opts                    = struct;
-%nlp_opts.ipopt.max_iter     = Iteration_max;
-%nlp_opts.ipopt.max_cpu_time = Time_max*3600;
-%nlp_opts.ipopt.acceptable_tol     = 1e-4;
-%nlp_opts.ipopt.tol      = 1e-6;
-%nlp_opts.ipopt.hessian_approximation ='limited-memory';
-
 which_k                 = [      44,   46];                                 % Select which parameters are used for fitting
 k_lu                    = [ [     0;    0], ...
                             [   inf;  inf] ];
 Nk                      = numel(which_k)+0;                                 % Parameters within the model + sigma
-
-%DATA_K_OUT              = nan(Nk,N_trial);                                  % Store Parameters obatined from all fits (par num x num exper)
-%OBJ_OUT                 = nan(1,N_trial);
 
 AA = xlsread('Regression.xlsx');
 DI = [0.71383013	1.076801997	2.179470155	2.475532632	1.390707877	1.336111172	1.882954204	2.457886055	0.564935512	1.542106938	0.835725102	0.87349666];
@@ -145,6 +131,9 @@ m_fluid                 = [zeros(1,numel(nstagesbefore)) m_fluid];
 C0fluid                 = m_fluid * 1e-3 ./ V_fluid';
 
 RES_IF = [];
+all_results = cell(12, 1);
+operating_conditions = zeros(12, 3);  % [Pressure, Temperature, Flow]
+
 for jj = 1:12
     which_dataset           = jj;
 
@@ -155,6 +144,9 @@ for jj = 1:12
     T0homog                 = LabResults(2,which_dataset+1);                    % K
     feedPress               = LabResults(3,which_dataset+1) * 10;               % MPa -> bar
     Flow                    = LabResults(4,which_dataset+1) * 1e-5 ;            % kg/s
+
+    % Store operating conditions
+    operating_conditions(jj, :) = [feedPress, T0homog, Flow];
 
     Z                       = Compressibility( T0homog, feedPress,         Parameters );
     rho                     = rhoPB_Comp(      T0homog, feedPress, Z,      Parameters );
@@ -222,16 +214,13 @@ for jj = 1:12
     % Evaluate Hessian at theta_hat
     HH = full(hessian_func( [DI(jj),GG(jj)] ));
 
-    %Hes = hessian(dot(J_L,J_L),k);
-    %FF  = Function('FF', {k}, {Hes} );
-    %HH  = full(FF([DI(jj),GG(jj)]));
-
     %%
     JAC = [];
     IF  = [];
     for kk=1:numel(Yield_estimate_diff)
-        residuals_k = residuals(kk)^2;
-        J_k         = (numel(residuals)./2 .* log(2.*pi)) - (numel(residuals)./2 .* log(sigma)) - residuals_k./(2.*sigma);
+        residuals_k = residuals(kk);  % Individual residual (not squared)
+        % Log-likelihood contribution from single observation kk
+        J_k         = -0.5*log(2*pi*sigma) - residuals_k^2/(2*sigma);
         Jac         = gradient(J_k,k);
         DD          = Function('DD', {k}, {Jac} );
         JJ          = full(DD([DI(jj),GG(jj)]));
@@ -243,19 +232,86 @@ for jj = 1:12
     fprintf('    Experiment %1.0f: Pressure = %4.2f bar, Temperture = %4.2f C, Mass Flow rate = %4.6f kg/s \n', jj, feedPress(1), feedTemp(1)-273, feedFlow(1) );
     fprintf('========================================\n\n');
 
-    results = summerizer_results_influence(HH, reshape(JAC, 2, 13));
-    %   visualize_influence(results, 'TopN', 3);
+    results = summerizer_results_influence(HH, reshape(JAC, 2, numel(Yield_estimate_diff)));
+    %visualize_influence(results, 'TopN', 3);
 
-    RES_IF = [RES_IF; results.IF];
+    RES_IF = [RES_IF; results.IF'];
+    all_results{jj} = results;
 end
 
+%% Visualize results from all experiments
+fprintf('\n========================================\n');
+fprintf('  CREATING COMPREHENSIVE VISUALIZATIONS\n');
+fprintf('========================================\n\n');
+
+%visualize_all_experiments(all_results, operating_conditions);
+
+%%
+%{
+COLOR = ['r','b','k','m', 'r','b','k','m'];
+figure();
+for ii=1:8
+
+    if ii < 5
+        figure(1)
+    else
+        figure(2)
+    end
+    
+    hold on;
+
+    T0homog                 = LabResults(2,ii+1);                    % K
+    feedPress               = LabResults(3,ii+1) * 10;               % MPa -> bar
+    Flow                    = LabResults(4,ii+1) * 1e-5 ;            % kg/s
+
+    scatter(all_results{ii}.IF(1,:)', all_results{ii}.IF(2,:)', MarkerEdgeColor=COLOR(ii), MarkerFaceColor=COLOR(ii))
+    
+    xlabel('IF of $\gamma$');
+    ylabel('IF of $D_i^R$');
+
+    for jj=1:numel(residuals)
+        text(all_results{ii}.IF(1,jj)',0.01+all_results{ii}.IF(2,jj)',num2str(jj))
+    end
+end
+hold off
+
+figure(1); 
+axis square;
+legend('100 bar','120 bar','160 bar','200 bar'); legend box on;
+set(findall(gcf,'-property','FontSize'),'FontSize',14)
+print('IF_40C.png','-dpng', '-r500');
+
+figure(2); 
+axis square;
+legend('100 bar','120 bar','160 bar','200 bar'); legend box on;
+set(findall(gcf,'-property','FontSize'),'FontSize',14)
+print('IF_30C.png','-dpng', '-r500');
+
+%%
+figure(3)
+hold on;
+
+for ii=9:12
+
+    T0homog                 = LabResults(2,ii+1);                    % K
+    feedPress               = LabResults(3,ii+1) * 10;               % MPa -> bar
+    Flow                    = LabResults(4,ii+1) * 1e-5 ;            % kg/s
+
+    scatter(all_results{ii}.IF(1,:)', all_results{ii}.IF(2,:)', MarkerEdgeColor=COLOR(ii-8), MarkerFaceColor=COLOR(ii-8))
+    
+    xlabel('IF of $\gamma$');
+    ylabel('IF of $D_i^R$');
+
+    for jj=1:numel(residuals)
+        text(all_results{ii}.IF(1,jj)',0.01+all_results{ii}.IF(2,jj)',num2str(jj))
+    end
+end
+hold off
+
+axis square;
+legend('100 bar','120 bar','160 bar','200 bar'); legend box on; legend('location','southeast')
+set(findall(gcf,'-property','FontSize'),'FontSize',14)
+print(figure(3),'IF_F_3.png','-dpng', '-r500');
 
 
-
-
-
-
-
-
-
-
+%}

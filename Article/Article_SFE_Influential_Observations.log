@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.5) (preloaded format=pdflatex 2023.5.26)  21 JAN 2026 22:52
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.5) (preloaded format=pdflatex 2023.5.26)  3 FEB 2026 22:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1882,7 +1882,7 @@ s not changed.
 Here is how much of TeX's memory you used:
  44428 strings out of 476411
  977102 string characters out of 5787718
- 1931845 words of memory out of 5000000
+ 1930845 words of memory out of 5000000
  63814 multiletter control sequences out of 15000+600000
  647194 words of font info for 212 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -1906,10 +1906,10 @@ tix-mathrm-bold.pfb><C:/Users/Omistaja/AppData/Local/Programs/MiKTeX/fonts/type
 1/public/stix/stix-mathrm.pfb><C:/Users/Omistaja/AppData/Local/Programs/MiKTeX/
 fonts/type1/public/stix/stix-mathscr.pfb><C:/Users/Omistaja/AppData/Local/Progr
 ams/MiKTeX/fonts/type1/public/stix/stix-mathsf.pfb>
-Output written on Article_SFE_Influential_Observations.pdf (14 pages, 2655906 b
+Output written on Article_SFE_Influential_Observations.pdf (14 pages, 2655386 b
 ytes).
 PDF statistics:
- 639 PDF objects out of 1000 (max. 8388607)
+ 638 PDF objects out of 1000 (max. 8388607)
  145 named destinations out of 1000 (max. 500000)
  374 words of extra memory for PDF output out of 10000 (max. 10000000)
 
